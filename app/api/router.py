@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from app.api.v1.endpoints import patient
 
 api_router = APIRouter()
 
@@ -12,3 +13,5 @@ async def check_health():
         "engine": "MedMemory AI Backend",
         "version": "1.0.0-rc1"
     }
+
+api_router.include_router(patient.router)

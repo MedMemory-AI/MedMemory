@@ -1,0 +1,20 @@
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://postgres:local_secret@localhost:5432/medmemory"
+}
+
+generator client {
+  provider             = "prisma-client-py"
+  recursive_type_depth = 5
+}
+
+
+//==>> Database Model Mapping: Defines the exact structure of tables
+
+model Patient {
+  id        String   @id @default(uuid())
+  fullName  String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+}
