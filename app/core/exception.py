@@ -18,10 +18,26 @@ class ClinicalParsingError(MedMemoryException):
     def __init__(self, detail: str):
         super().__init__(detail=detail, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
+class ClinicalNERError(MedMemoryException):
+    """Raised when spaCy/sciSpacy model load or NER entity linking fails."""
+    def __init__(self, detail: str):
+        super().__init__(detail=detail, status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
+
 class VectorStoreException(MedMemoryException):
     """Raised when Qdrant connections time out or read/write vectors fail."""
     def __init__(self, detail: str):
         super().__init__(detail=detail, status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+class ClinicalExtractionError(MedMemoryException):
+    """Raised when LLM-based structured extraction fails or times out."""
+    def __init__(self, detail: str):
+        super().__init__(detail=detail, status_code=status.HTTP_502_BAD_GATEWAY)
+
+class DatabaseError(MedMemoryException):
+    """Raised when PostgreSQL/Neon transactional writes or Prisma connections fail."""
+    def __init__(self, detail: str):
+        super().__init__(detail=detail, status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
+
 
 def register_exception_handlers(app: FastAPI):
     """
