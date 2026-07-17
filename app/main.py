@@ -7,6 +7,7 @@ from app.api.router import api_router
 from app.core.logger import logger  # Imports logger and boots up setup_centralized_logging()
 from app.core.exception import register_exception_handlers
 from app.core.lifespan import app_lifespan
+from app.api.middleware import AuthMiddleware
 
 
 app = FastAPI(
@@ -18,6 +19,9 @@ app = FastAPI(
 
 # Register the global exception routers
 register_exception_handlers(app)
+
+# Register the authentication enforcement middleware globally
+app.add_middleware(AuthMiddleware, protected_prefixes=["/api/v1/ingestion", "/api/v1/timeline", "/api/v1/chat"])
 
 # Set up open-source sandbox cross-origin accessibility
 app.add_middleware(

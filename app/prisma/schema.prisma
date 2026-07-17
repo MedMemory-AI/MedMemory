@@ -1,20 +1,48 @@
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://postgres:local_secret@localhost:5432/medmemory"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
   provider             = "prisma-client-py"
-  recursive_type_depth = 5
+  recursive_type_depth = 3 // Optimized depth to keep memory usage low
 }
 
-
-//==>> Database Model Mapping: Defines the exact structure of tables
-
 model Patient {
-  id        String   @id @default(uuid())
-  fullName  String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
+  id        String   @id @default(uuid()) @db.Uuid
+  fullName  String   @db.VarChar(100)
+  email     String   @unique @db.VarChar(255)
+  password  String   @db.VarChar(255)
+
+  documents Document[] // Unified relation array
+
+  createdAt DateTime @default(now()) @db.Timestamptz
+
+  @@map("patients")
+  @@index([email])
+}
+
+model Document {
+  id           String   @id @default(uuid()) @db.Uuid
+  patientId    String   @db.Uuid
+  docType      String   @db.VarChar(20) // "prescription" or "report"
+
+  date         DateTime @db.Date
+  doctor       String?  @db.VarChar(100)
+
+  // Report-specific fields
+  findings     Json?    
+  diseases     String[] @db.VarChar(100)
+
+  // Prescription-specific fields
+  highlights   String?  @db.VarChar(500)
+  treatment    String?  @db.Text
+  preDiagnosis String?  @db.VarChar(255)
+
+  createdAt    DateTime @default(now()) @db.Timestamptz
+
+  patient      Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@map("documents")
+  @@index([patientId, date, createdAt, docType])
 }
