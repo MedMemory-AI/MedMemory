@@ -92,7 +92,7 @@ async def store_clinical_metadata(
         if normalized_type not in ["prescription", "report"]:
             raise ValueError(f"Unsupported clinical doc_type parameter variant: '{doc_type}'")
 
-        logger.info(f"[DB Ingestion] Writing record to unified documents table for Patient ID: {patient_id} ({normalized_type})")
+        logger.info(f"[DB Ingestion] Writing record to unified documents table ({normalized_type})")
 
         # 1. Parse findings JSON gracefully
         raw_findings = metadata.get("findings")
