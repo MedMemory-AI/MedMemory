@@ -51,7 +51,7 @@ async def query_copilot_stream(
     Streams the conversational pipeline lifecycle phases and live LLM tokens 
     back to the client UI layer via Server-Sent Events (SSE).
     """
-    logger.info(f"[SSE Chat Request] Initiating real-time pipeline connection for patient: {patient_id}")
+    logger.info("[SSE Chat Request] Initiating real-time pipeline connection")
     
     # Generate the streaming generator iterator loop
     event_generator = stream_rag_pipeline(patient_id=patient_id, raw_query=payload.query)
