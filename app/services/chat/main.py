@@ -84,7 +84,11 @@ async def retrieve_node(state: RAGState) -> Dict[str, Any]:
 
 async def generate_node(state: RAGState) -> Dict[str, Any]:
     """NODE 4: Generation ( Assembles prompt and gets answer from LLM model. )"""
-    logger.info(f"[Node 4/4] Generating response for Patient ID: '{state['patient_id']}'")
+    patient_id = state.get("patient_id", "")
+    masked_patient_id = (
+        f"{patient_id[:2]}***{patient_id[-2:]}" if isinstance(patient_id, str) and len(patient_id) > 4 else "***"
+    )
+    logger.info(f"[Node 4/4] Generating response for Patient ID: '{masked_patient_id}'")
     
     # Execute generation passing the clean query text and contextualized retrieval arrays
     generated_text = await generation_engine.generate_response(
