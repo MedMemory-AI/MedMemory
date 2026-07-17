@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+logs/
+data/
+
+# Virtual Environments
+venv/
+.env/
+.venv/
+
+# Environment Variables
+.env
+.env.*
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Mypy
+.mypy_cache/
+
+# Ruff
+.ruff_cache/
+
+# Prisma Generated
+app/prisma/__pycache__/
+
+# Docker
+Dockerfile
+docker-compose.yml
+
+# Docs
+docs/
+site/
+
+# MKDocs
+mkdocs.yml
+
+# Local DB files
+*.sqlite3
+
+# Node
+node_modules/
+
+# Temporary files
+tmp/
+temp/
