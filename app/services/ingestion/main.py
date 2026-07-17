@@ -26,7 +26,7 @@ async def run_validation_and_storage(inputs: Dict[str, Any]) -> Dict[str, Any]:
     redacted_patient_id = f"***{patient_id[-4:]}" if patient_id and len(patient_id) > 4 else "***"
     
     logger.info(
-        f"Step 1/8: Validating and saving document '{file.filename}' for patient {redacted_patient_id}"
+        f"Step 1/8: Validating and saving document '{file.filename}'"
     )
     
     # CLEAN REFACTOR: Cleanly await the asynchronous storage engine instead of calling asyncio.run()
