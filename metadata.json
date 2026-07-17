@@ -1,0 +1,26 @@
+{
+    "imgUrl": "/utils/projects/medmemory_project.png",
+    "title": "MedMemory AI",
+    "description": "AI-powered medical memory with timeline generation, RAG chat, report analysis, and health insights.",
+    "techStack": [
+        "React Native",
+        "FastAPI",
+        "LangGraph",
+        "Qdrant",
+        "PostgreSQL",
+        "Ollama",
+        "PyMuPDF",
+        "Tesseract",
+        "Docker",
+        "Prisma"
+    ],
+    "keyFeatures": [
+        "Built MedMemory AI, a personal medical memory platform that converts reports into a structured health timeline",
+        "Implemented AI-powered chat over complete medical history using RAG, Qdrant, and local LLMs via Ollama",
+        "Developed an automated document ingestion pipeline with OCR, medical information extraction, and timeline generation",
+        "Integrated semantic search, structured medical records, and patient-specific retrieval for contextual responses"
+    ],
+    "isLiveLink": "false",
+    "githubLink": "https://github.com/MedMemory-AI",
+    "liveLink": ""
+}
