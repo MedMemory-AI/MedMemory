@@ -56,7 +56,7 @@ async def save_extracted_data_to_qdrant(state: Dict[str, Any]) -> Dict[str, Any]
     except RuntimeError as r_err:
         raise DatabaseError(str(r_err))
 
-    logger.info(f"[Step 7/8 Started] Target indexing: Patient '{patient_id}' - DocType '{doc_type}'")
+    logger.info(f"[Step 7/8 Started] Target indexing: Patient '[REDACTED]' - DocType '{doc_type}'")
 
     # 3. Extract structured search filter variables
     raw_date = clinical_metadata.get("date") or "1970-01-01"
