@@ -25,7 +25,7 @@ class RAGState(TypedDict):
 
 async def validate_node(state: RAGState) -> Dict[str, Any]:
     """NODE 1: Validation ( Validates and sanitizes the user's input query. )"""
-    logger.info(f"[Node 1/4] Classifying intent for query: '{state['patient_id']}'")
+    logger.info("[Node 1/4] Validating and sanitizing input query")
     
     cleaned = clean_and_validate_query(state["raw_query"])
     return {"cleaned_query": cleaned}
