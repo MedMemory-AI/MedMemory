@@ -124,7 +124,7 @@ async def execute_retrieval_engine(
     query_vector = await get_query_embedding(query)
     
     # Step 2: Extract top relevant chunks from Qdrant first (Max 10)
-    logger.info(f"[Retrieval Engine] Fetching Qdrant matches for Patient: {patient_id}")
+    logger.info("[Retrieval Engine] Fetching Qdrant matches for current patient context.")
     semantic_chunks = await retrieve_qdrant_docs(patient_id, query_vector, limit=10)
     
     if not semantic_chunks:
