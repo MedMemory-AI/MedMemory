@@ -23,8 +23,11 @@ async def run_validation_and_storage(inputs: Dict[str, Any]) -> Dict[str, Any]:
     """
     file: UploadFile = inputs["file"]
     patient_id: str = inputs["patient_id"]
+    redacted_patient_id = f"***{patient_id[-4:]}" if patient_id and len(patient_id) > 4 else "***"
     
-    logger.info(f"Step 1/8: Validating and saving document '{file.filename}' for patient {patient_id}")
+    logger.info(
+        f"Step 1/8: Validating and saving document '{file.filename}' for patient {redacted_patient_id}"
+    )
     
     # CLEAN REFACTOR: Cleanly await the asynchronous storage engine instead of calling asyncio.run()
     file_path, file_size, safe_filename = await validate_and_save_file(file, patient_id)
