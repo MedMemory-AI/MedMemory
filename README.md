@@ -28,6 +28,10 @@ For enterprise architecture blueprints, detailed multi-agent workflows, database
 
 If you are a contributor working specifically on the Python codebase, you can fire up the local development engine using these steps:
 
+### Detailed Guide: [Local Setup Guide](https://medmemory-ai.github.io/docs/Guides/Local-Setup/)
+
+---
+
 ### 1. Initialize Your Environment
 ```bash
 git clone [https://github.com/MedMemory-AI/server.git](https://github.com/MedMemory-AI/server.git)

@@ -27,3 +27,15 @@ class AuthSuccessResponse(BaseModel):
     success: bool = True
     message: str
     data: AuthSuccessData
+
+
+class MeProfileData(BaseModel):
+    id: str
+    fullName: str
+    email: str
+
+
+class MeProfileResponse(BaseModel):
+    success: bool = True
+    message: str
+    data: MeProfileData

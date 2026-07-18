@@ -46,3 +46,15 @@ class AuthService:
             
         token = create_access_token({"id": str(patient.id), "email": patient.email})
         return patient, token
+
+
+    @staticmethod
+    async def get_patient_profile(patient_id: str) -> Patient:
+        """Fetches the authenticated patient's profile from the database."""
+        await connect_db()
+
+        patient = await db.patient.find_unique(where={"id": patient_id})
+        if not patient:
+            raise ValueError("Patient profile not found.")
+
+        return patient

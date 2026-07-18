@@ -18,15 +18,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Create virtual environment
 RUN python -m venv /opt/venv
-
 ENV PATH="/opt/venv/bin:$PATH"
 
+# Upgrade pip first
+RUN pip install --upgrade pip
+
+# Install CPU-only Torch variants straight from PyTorch mirror
+RUN pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu
+
 COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
-
-RUN npm install -g prisma
+# Run prisma generation inside the venv (No global npm needed)
+RUN prisma generate
 
 
 # ==========================================
@@ -48,7 +52,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Copy virtualenv
 COPY --from=builder /opt/venv /opt/venv
-
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Copy application
@@ -59,7 +62,6 @@ RUN groupadd -r appgroup && \
     useradd -r -g appgroup appuser
 
 RUN chown -R appuser:appgroup /app
-
 USER appuser
 
 EXPOSE 8000

@@ -21,7 +21,7 @@ app = FastAPI(
 register_exception_handlers(app)
 
 # Register the authentication enforcement middleware globally
-app.add_middleware(AuthMiddleware, protected_prefixes=["/api/v1/ingestion", "/api/v1/timeline", "/api/v1/chat"])
+app.add_middleware(AuthMiddleware, protected_prefixes=["/api/v1/auth", "/api/v1/ingestion", "/api/v1/timeline", "/api/v1/chat"])
 
 # Set up open-source sandbox cross-origin accessibility
 app.add_middleware(

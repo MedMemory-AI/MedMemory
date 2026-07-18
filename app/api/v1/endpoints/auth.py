@@ -1,5 +1,13 @@
-from fastapi import APIRouter, HTTPException, status
-from app.schemas.auth import RegisterRequest, LoginRequest, AuthSuccessResponse, AuthSuccessData
+from fastapi import APIRouter, Depends, HTTPException, status
+from app.api.deps import get_current_patient_id
+from app.schemas.auth import (
+    RegisterRequest,
+    LoginRequest,
+    AuthSuccessResponse,
+    AuthSuccessData,
+    MeProfileResponse,
+    MeProfileData,
+)
 from app.services.auth.main import AuthService
 from app.core.logger import logger
 
@@ -54,6 +62,28 @@ async def login(payload: LoginRequest) -> AuthSuccessResponse:
         )
     except ValueError as val_err:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(val_err))
+
+
+@router.get("/me", response_model=MeProfileResponse, status_code=status.HTTP_200_OK)
+async def get_me(patient_id: str = Depends(get_current_patient_id)) -> MeProfileResponse:
+    """Returns the authenticated patient's profile details from the current session token."""
+    try:
+        patient = await AuthService.get_patient_profile(patient_id=patient_id)
+
+        logger.info(f"[Auth API] Retrieved profile for patient: {patient.id}")
+        return MeProfileResponse(
+            message="Profile retrieved successfully.",
+            data=MeProfileData(
+                id=str(patient.id),
+                fullName=patient.fullName,
+                email=patient.email,
+            )
+        )
+    except ValueError as val_err:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(val_err))
+    except Exception as exc:
+        logger.error(f"[Auth API Exception] Profile retrieval failed: {exc}", exc_info=True)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Server profile retrieval process error.")
 
 
 @router.post("/logout", status_code=status.HTTP_200_OK)

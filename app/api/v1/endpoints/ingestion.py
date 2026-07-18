@@ -35,11 +35,9 @@ async def upload_file(
         
         # Return the processed metadata back to the client (includes Step-4 NER/EL mesh)
         metadata = UploadResponse(
-            filename=output_state["safe_filename"],
+            filePath=output_state["file_path"],
             mimeType=output_state["mime_type"],
             size=output_state["file_size"],
-            filePath=output_state["file_path"],
-            raw_text=output_state["raw_text"],
             cleaned_text=output_state["cleaned_text"],
             ner=output_state.get("ner"),
             extraction=output_state.get("clinical_metadata"),

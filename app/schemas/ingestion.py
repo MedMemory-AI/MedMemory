@@ -93,11 +93,9 @@ class UploadResponse(BaseModel):
     """
     Structured metadata representing a successfully written medical record.
     """
-    filename: str
+    filePath: str
     mimeType: str
     size: int
-    filePath: str
-    raw_text: str
     cleaned_text: str
     ner: Optional[NERProcessingResponseSchema] = None
     extraction: Optional[ClinicalExtractionSchema] = None
