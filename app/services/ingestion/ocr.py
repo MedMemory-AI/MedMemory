@@ -5,10 +5,15 @@ import shutil
 import asyncio
 from pathlib import Path
 from PIL import Image
-import fitz  # PyMuPDF
 
 from app.core.logger import logger
 from app.core.exception import ClinicalParsingError
+
+try:
+    import fitz  # PyMuPDF
+except ImportError:
+    fitz = None
+    logger.warning("PyMuPDF is not installed; PDF parsing will be unavailable in this runtime.")
 
 try:
     import pytesseract
@@ -94,6 +99,9 @@ def extract_pdf_text_with_fallback(file_path: Path) -> str:
     doc_text = []
     has_digital_text = False
     
+    if fitz is None:
+        raise ClinicalParsingError("Cannot parse PDFs: PyMuPDF is not installed in this runtime.")
+
     try:
         logger.info(f"Opening PDF file with PyMuPDF layout parser: {file_path.name}")
         with fitz.open(str(file_path)) as doc:

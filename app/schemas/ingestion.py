@@ -102,8 +102,12 @@ class UploadResponse(BaseModel):
     createdAt: datetime
 
 
+class ProcessingResponse(BaseModel):
+    status: str
+    estimatedTime: str
+
 
 class IngestionSuccessResponse(BaseModel):
     success: bool = True
     message: str
-    data: UploadResponse
+    data: ProcessingResponse

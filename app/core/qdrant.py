@@ -6,11 +6,16 @@ class QdrantSettings:
     PORT: int = int(os.getenv("MEDMEMORY_QDRANT_PORT", "6333"))
     API_KEY: str | None = os.getenv("MEDMEMORY_QDRANT_API_KEY", None)
     
+    HTTPS: bool = False
+    
     # Collection tracking parameters
     COLLECTION_NAME: str = "clinical_documents"
     EMBEDDING_DIMENSION: int = 1024  # mxbai-embed-large:latest output shape
     
     # Ollama embedding reference
-    OLLAMA_EMBED_MODEL: str = "mxbai-embed-large:latest"
+    OLLAMA_EMBED_MODEL: str = os.getenv(
+        "OLLAMA_EMBED_MODEL",
+        "mxbai-embed-large:latest",
+    )
 
 qdrant_settings = QdrantSettings()

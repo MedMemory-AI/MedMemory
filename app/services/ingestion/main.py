@@ -2,11 +2,10 @@
 import os
 from pathlib import Path
 from typing import Dict, Any
-from fastapi import UploadFile
 from langchain_core.runnables import RunnableLambda
 
 from app.core.logger import logger
-from app.services.ingestion.validate_store import validate_and_save_file, BASE_DIR
+from app.services.ingestion.validate_store import BASE_DIR
 from app.services.ingestion.ocr import process_document_ocr
 from app.services.ingestion.normalizer import process_text_normalization
 from app.services.ingestion.ner import extract_clinical_entities
@@ -17,28 +16,16 @@ from app.services.ingestion.store_qdrant import save_extracted_data_to_qdrant
 
 
 # --- LANGCHAIN RUNNABLE STEPS ---
-async def run_validation_and_storage(inputs: Dict[str, Any]) -> Dict[str, Any]:
+async def run_validation_and_storage(
+    inputs,
+):
     """
-    1. Step: Validates the metadata constraints and flushes the buffer 
-    to an isolated disk directory asynchronously without thread loop blockers.
+    Step 1.
+    File already validated & saved by /upload. Only logs metadata.
     """
-    file: UploadFile = inputs["file"]
-    patient_id: str = inputs["patient_id"]
-    redacted_patient_id = f"***{patient_id[-4:]}" if patient_id and len(patient_id) > 4 else "***"
-    
     logger.info(
-        f"Step 1/8: Validating and saving document '{file.filename}'"
+        "Step 1/8: File already validated. Starting pipeline..."
     )
-    
-    # CLEAN REFACTOR: Cleanly await the asynchronous storage engine instead of calling asyncio.run()
-    file_path, file_size, safe_filename = await validate_and_save_file(file, patient_id)
-    
-    inputs.update({
-        "file_path": file_path,
-        "file_size": file_size,
-        "safe_filename": safe_filename,
-        "mime_type": file.content_type
-    })
     return inputs
 
 

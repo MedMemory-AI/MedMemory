@@ -25,14 +25,14 @@ done
 echo "Ollama is healthy."
 
 echo "[3/7] Checking Chat Model..."
-if ! docker exec medmemory-ollama ollama list | grep -w "qwen2.5:3b"; then
+if ! docker exec medmemory-ollama ollama list | grep -q "^qwen2.5:3b"; then
     docker exec medmemory-ollama ollama pull qwen2.5:3b
 else
     echo "qwen2.5:3b already installed."
 fi
 
 echo "[4/7] Checking Embedding Model..."
-if ! docker exec medmemory-ollama ollama list | grep -q "mxbai-embed-large"; then
+if ! docker exec medmemory-ollama ollama list | grep -q "^mxbai-embed-large"; then
     docker exec medmemory-ollama ollama pull mxbai-embed-large
 else
     echo "mxbai-embed-large already installed."
@@ -48,8 +48,8 @@ echo "FastAPI healthy."
 
 echo ""
 echo "[6/7] Running Prisma DB Push..."
-docker compose exec backend prisma db push \
-  --schema=app/prisma/schema.prisma
+docker compose exec backend sh -c \
+  "prisma db push --schema=app/prisma/schema.prisma"
 
 echo ""
 echo "[7/7] Checking Services..."

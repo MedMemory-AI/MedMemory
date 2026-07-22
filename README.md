@@ -9,6 +9,7 @@ This repository houses the high-performance local RAG backend server engineered 
 ## 📚 Central Documentation Portal
 For enterprise architecture blueprints, detailed multi-agent workflows, database designs, and front-end interface integrations, please visit our centralized tracking zones:
 
+* **Install App APK:** [Latest Release](https://github.com/MedMemory-AI/frontend-app/releases/latest)
 * 🌐 **Live Documentation Portal:** [medmemory-ai.github.io/docs](https://medmemory-ai.github.io/docs/)
 * 🏛️ **Global Organization Workspace:** [@MedMemory-AI](https://github.com/MedMemory-AI)
 

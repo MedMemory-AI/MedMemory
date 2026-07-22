@@ -26,6 +26,7 @@ async def connect_db():
         qdrant_client = AsyncQdrantClient(
             host=qdrant_settings.HOST,
             port=qdrant_settings.PORT,
+            https=qdrant_settings.HTTPS,
             api_key=qdrant_settings.API_KEY,
             timeout=10.0,
             check_compatibility=False
@@ -66,8 +67,11 @@ async def init_qdrant_collections():
                 )
             )
             logger.info(f"[Qdrant Init] Collection '{qdrant_settings.COLLECTION_NAME}' initialized successfully.")
-    except Exception as e:
-        logger.error(f"[Qdrant Init] Critical error orchestrating vector collections: {e}")
+    except Exception:
+        logger.exception(
+            "[Qdrant Init] Failed while initializing collection."
+        )
+        raise
 
 
 def get_qdrant_client() -> AsyncQdrantClient:

@@ -2,8 +2,10 @@ from datetime import datetime, timezone
 from enum import Enum
 from fastapi import APIRouter, Depends, File, UploadFile, HTTPException, Header, status
 from app.api.deps import get_current_patient_id
-from app.schemas.ingestion import IngestionSuccessResponse, UploadResponse
+from app.schemas.ingestion import IngestionSuccessResponse, ProcessingResponse, UploadResponse
+from app.services.ingestion.background import start_background_processing
 from app.services.ingestion.main import execute_ingestion_pipeline
+from app.services.ingestion.validate_store import validate_and_save_file
 
 # Initialize specialized ingestion router paths
 router = APIRouter(prefix="/ingestion", tags=["Ingestion"])
@@ -13,7 +15,7 @@ class DocType(str, Enum):
     REPORT = "report"
 
 
-@router.post("/upload", response_model=IngestionSuccessResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/upload", response_model=IngestionSuccessResponse, status_code=status.HTTP_202_ACCEPTED)
 async def upload_file(
     file: UploadFile = File(...),
     x_doc_type: DocType = Header(..., description="The type of clinical record being ingested (prescription/report)"),
@@ -24,29 +26,31 @@ async def upload_file(
     """
     try:
         # Prepare the initial state dictionary
+        file_path, file_size, safe_filename = (
+            await validate_and_save_file(
+                file,
+                patient_id,
+            )
+        )
         initial_state = {
             "file": file,
             "patient_id": patient_id,
-            "doc_type": x_doc_type.value
+            "doc_type": x_doc_type.value,
+            "file_path": file_path,
+            "file_size": file_size,
+            "safe_filename": safe_filename,
+            "mime_type": file.content_type,
         }
         
         # Invoke the LangChain pipeline asynchronously
-        output_state = await execute_ingestion_pipeline(initial_state)
-        
-        # Return the processed metadata back to the client (includes Step-4 NER/EL mesh)
-        metadata = UploadResponse(
-            filePath=output_state["file_path"],
-            mimeType=output_state["mime_type"],
-            size=output_state["file_size"],
-            cleaned_text=output_state["cleaned_text"],
-            ner=output_state.get("ner"),
-            extraction=output_state.get("clinical_metadata"),
-            createdAt=datetime.now(timezone.utc)
-        )
+        start_background_processing(initial_state)
         
         return IngestionSuccessResponse(
-            message="Document pipeline completed. PostgreSQL and Qdrant records successfully updated.",
-            data=metadata
+            message="Document uploaded successfully. Processing has started.",
+            data=ProcessingResponse(
+                status="processing",
+                estimatedTime="1-2 minutes",
+            ),
         )
         
     except ValueError as val_err:

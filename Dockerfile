@@ -2,71 +2,114 @@
 # Stage 1 - Builder
 # ==========================================
 
-FROM python:3.12-slim AS builder
+FROM python:3.11-slim AS builder
 
 WORKDIR /app
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    HOME=/home/appuser \
+    XDG_CACHE_HOME=/home/appuser/.cache
 
-# System dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    gcc \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+# Build dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        gcc \
+        curl \
+        libatomic1 && \
+    rm -rf /var/lib/apt/lists/*
 
-# Create virtual environment
+# Python virtual environment
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Upgrade pip first
 RUN pip install --upgrade pip
 
-# Install CPU-only Torch variants straight from PyTorch mirror
-RUN pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu
-
+# Install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Run prisma generation inside the venv (No global npm needed)
-RUN prisma generate
+# Copy source code
+COPY app ./app
+COPY README.md .
+
+# --------------------------------------------------
+# Create application user BEFORE Prisma generation
+# --------------------------------------------------
+RUN addgroup --system appgroup && \
+    adduser --system \
+        --ingroup appgroup \
+        --home /home/appuser \
+        appuser && \
+    mkdir -p /home/appuser/.cache/prisma-python && \
+    chown -R appuser:appgroup \
+        /home/appuser \
+        /app \
+        /opt/venv
+
+USER appuser
+
+# Generate Prisma client
+RUN prisma generate --schema=app/prisma/schema.prisma
+
+# Download Prisma Query Engine
+RUN prisma py fetch
 
 
 # ==========================================
 # Stage 2 - Runtime
 # ==========================================
 
-FROM python:3.12-slim
+FROM python:3.11-slim
 
 WORKDIR /app
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    HOME=/home/appuser \
+    XDG_CACHE_HOME=/home/appuser/.cache
 
-# Required runtime packages
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    tesseract-ocr \
-    && rm -rf /var/lib/apt/lists/*
+# Runtime dependencies only
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        curl \
+        libatomic1 && \
+    rm -rf /var/lib/apt/lists/*
 
-# Copy virtualenv
+# Copy Python virtual environment
 COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
+# Copy downloaded Prisma binaries/cache
+COPY --from=builder /home/appuser/.cache /home/appuser/.cache
+
 # Copy application
-COPY . .
+COPY app ./app
+COPY README.md .
 
-# Create non-root user
-RUN groupadd -r appgroup && \
-    useradd -r -g appgroup appuser
+# Create runtime user
+RUN addgroup --system appgroup && \
+    adduser --system \
+        --ingroup appgroup \
+        --home /home/appuser \
+        appuser && \
+    chown -R appuser:appgroup \
+        /home/appuser \
+        /app \
+        /opt/venv
 
-RUN chown -R appuser:appgroup /app
 USER appuser
 
 EXPOSE 8000
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-CMD curl -f http://localhost:8000/api/health || exit 1
+HEALTHCHECK \
+    --interval=30s \
+    --timeout=10s \
+    --start-period=30s \
+    --retries=3 \
+    CMD curl -fsS http://localhost:8000/api/health || exit 1
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
