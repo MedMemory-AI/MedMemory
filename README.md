@@ -1,4 +1,4 @@
-# ⚡ MedMemory AI –  Core Backend Server Engine
+# ⚡ HealthMemory AI –  Core Backend Server Engine
 
 > An open-source, AI-native clinical intelligence engine. Track, parse, and map longitudinal patient medical history locally.
 
