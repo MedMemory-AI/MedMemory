@@ -38,12 +38,8 @@ If you are a contributor working specifically on the Python codebase, you can fi
 ***For Existing Setup's***
 
 ```bash
-git clone [https://github.com/MedMemory-AI/server.git](https://github.com/MedMemory-AI/server.git)
-
 python -m venv venv
 venv\Scripts\activate       # On Linux/Mac-OS use `source venv/bin/activate`
-
-pip install -r requirements.txt     # If Not Installed...
 
 docker run -d -p 6333:6333 qdrant/qdrant        # Start DB's containers...
 docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=local_secret postgres
