@@ -12,6 +12,7 @@ For enterprise architecture blueprints, detailed multi-agent workflows, database
 * **Install App APK:** [Latest Release](https://github.com/MedMemory-AI/frontend-app/releases/latest)
 * 🌐 **Live Documentation Portal:** [medmemory-ai.github.io/docs](https://medmemory-ai.github.io/docs/)
 * 🏛️ **Global Organization Workspace:** [@MedMemory-AI](https://github.com/MedMemory-AI)
+* **DockerHub Image:** [medmemory-backend](https://hub.docker.com/r/srinivasbatthula05/medmemory-backend)
 
 ---
 
@@ -25,7 +26,7 @@ For enterprise architecture blueprints, detailed multi-agent workflows, database
 
 ---
 
-## 🚀 3-Step Local Quick Start
+## 🚀 Local Quick Start
 
 If you are a contributor working specifically on the Python codebase, you can fire up the local development engine using these steps:
 
@@ -33,31 +34,23 @@ If you are a contributor working specifically on the Python codebase, you can fi
 
 ---
 
-### 1. Initialize Your Environment
+## Quick Start Guide (Backend)
+***For Existing Setup's***
+
 ```bash
 git clone [https://github.com/MedMemory-AI/server.git](https://github.com/MedMemory-AI/server.git)
-cd server
+
 python -m venv venv
-source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-pip install -r requirements.txt
-```
+venv\Scripts\activate       # On Linux/Mac-OS use `source venv/bin/activate`
 
-### 2. Boot Local Infrastructure Layers
-Ensure your local Ollama instance is active and pull the model signatures:
-```bash
-ollama pull llama3.2
-ollama pull mxbai-embed-large
-```
-Spin up your local storage instances via Docker:
-```bash
-docker run -d -p 6333:6333 qdrant/qdrant
+pip install -r requirements.txt     # If Not Installed...
+
+docker run -d -p 6333:6333 qdrant/qdrant        # Start DB's containers...
 docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=local_secret postgres
+
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### 3. Run the Backend Server
-```bash
-uvicorn app.main:app --reload --port 8000
-```
 The API interactive sandbox environment will immediately be available at http://localhost:8000/docs.
 
 ---
