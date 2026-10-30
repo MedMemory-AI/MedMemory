@@ -1,4 +1,9 @@
 #!/bin/bash
+
+# Run these CMD's,
+#   chmod +x setup.sh
+#   ./setup.sh
+
 set -e
 
 echo ""

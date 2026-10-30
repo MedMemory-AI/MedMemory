@@ -1,6 +1,7 @@
-# ====================================
-# MedMemory Local Setup
-# ====================================
+# Run these CMD's,
+#   Set-ExecutionPolicy Bypass -Scope Process
+#   .\setup.ps1
+
 $ErrorActionPreference = "Stop"
 
 Write-Host ""
@@ -12,11 +13,9 @@ Write-Host ""
 # ------------------------------------
 # Docker Check
 # ------------------------------------
-try {
-    docker info *> $null
-}
-catch {
-    Write-Host "Docker is not running."
+docker ps 2>&1 | Out-Null
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Docker is not running or not responding."
     exit 1
 }
 
@@ -119,11 +118,3 @@ Write-Host "http://localhost:11434"
 
 Write-Host ""
 Write-Host "Setup Complete!"
-
-Write-Host ""
-Write-Host "Useful Commands"
-Write-Host "---------------"
-Write-Host "docker compose logs -f backend"
-Write-Host "docker compose logs -f ollama"
-Write-Host "docker compose down"
-Write-Host "docker compose restart backend"
