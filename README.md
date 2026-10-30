@@ -41,8 +41,8 @@ If you are a contributor working specifically on the Python codebase, you can fi
 python -m venv venv
 venv\Scripts\activate       # On Linux/Mac-OS use `source venv/bin/activate`
 
-docker run -d -p 6333:6333 qdrant/qdrant        # Start DB's containers...
-docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=local_secret postgres
+docker run -d --name medmemory-qdrant -p 6333:6333 -p 6334:6334 -v qdrant_storage:/qdrant/storage qdrant/qdrant:latest              # Start DB's containers...
+docker run -d --name medmemory-postgres -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=local_secret -e POSTGRES_DB=medmemory postgres:16
 
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
