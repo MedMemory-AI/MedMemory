@@ -20,6 +20,7 @@ class AuthSuccessData(BaseModel):
     id: str
     fullName: str
     email: str
+    isVerified: bool
     accessToken: str
     tokenType: str = "Bearer"
 
@@ -33,6 +34,11 @@ class MeProfileData(BaseModel):
     id: str
     fullName: str
     email: str
+    isVerified: bool
+
+
+class VerifyOtpRequest(BaseModel):
+    otp: str = Field(..., min_length=6, max_length=6, pattern=r"^\d{6}$", description="6-digit email OTP")
 
 
 class MeProfileResponse(BaseModel):

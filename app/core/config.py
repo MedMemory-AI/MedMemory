@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
 
     ENV: str = "development"
-    DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/medmemory"
+    DATABASE_URL: str = os.getenv("DATABASE_URL")
     
     MEDMEMORY_QDRANT_HOST: str = "localhost"
     MEDMEMORY_QDRANT_PORT: str = "6333"
@@ -27,6 +27,14 @@ class Settings(BaseSettings):
     JWT_SECRET_KEY: str = os.getenv("MEDMEMORY_JWT_SECRET", "super_secret_system_level_crypto_key_change_me_in_prod")
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440   # 24hrs expiry...
+
+    OTP_EXPIRE_MINUTES: int = 10
+    SMTP_HOST: str = "smtp.gmail.com"
+    SMTP_PORT: int = 587
+    SMTP_USERNAME: str = os.getenv("SMTP_USERNAME")
+    SMTP_PASSWORD: str = os.getenv("SMTP_PASSWORD")
+    SMTP_FROM_EMAIL: str = "MedMemory-AI <srinivasbatthula05.official@gmail.com>"
+    SMTP_USE_TLS: bool = True
 
     # Configures strict casing match and ignores extra internal system environment tokens
     model_config = SettingsConfigDict(

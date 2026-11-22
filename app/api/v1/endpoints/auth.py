@@ -7,6 +7,7 @@ from app.schemas.auth import (
     AuthSuccessData,
     MeProfileResponse,
     MeProfileData,
+    VerifyOtpRequest,
 )
 from app.services.auth.main import AuthService
 from app.core.logger import logger
@@ -26,11 +27,12 @@ async def register(payload: RegisterRequest) -> AuthSuccessResponse:
         
         logger.info(f"[Auth API] Created patient profile record: {patient.id}")
         return AuthSuccessResponse(
-            message="Patient account registered successfully.",
+            message="Patient account registered successfully. A verification OTP has been sent to your email.",
             data=AuthSuccessData(
                 id=str(patient.id),
                 fullName=patient.fullName,
                 email=patient.email,
+                isVerified=patient.isVerified,
                 accessToken=token
             )
         )
@@ -52,16 +54,20 @@ async def login(payload: LoginRequest) -> AuthSuccessResponse:
         
         logger.info(f"[Auth API] Session generated successfully for profile: {patient.id}")
         return AuthSuccessResponse(
-            message="Login successful.",
+            message="Login successful. A verification OTP has been sent to your email.",
             data=AuthSuccessData(
                 id=str(patient.id),
                 fullName=patient.fullName,
                 email=patient.email,
+                isVerified=patient.isVerified,
                 accessToken=token
             )
         )
     except ValueError as val_err:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(val_err))
+    except Exception as exc:
+        logger.error(f"[Auth API Exception] Login failed: {exc}", exc_info=True)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Server login process error.")
 
 
 @router.get("/me", response_model=MeProfileResponse, status_code=status.HTTP_200_OK)
@@ -77,6 +83,7 @@ async def get_me(patient_id: str = Depends(get_current_patient_id)) -> MeProfile
                 id=str(patient.id),
                 fullName=patient.fullName,
                 email=patient.email,
+                isVerified=patient.isVerified,
             )
         )
     except ValueError as val_err:
@@ -84,6 +91,35 @@ async def get_me(patient_id: str = Depends(get_current_patient_id)) -> MeProfile
     except Exception as exc:
         logger.error(f"[Auth API Exception] Profile retrieval failed: {exc}", exc_info=True)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Server profile retrieval process error.")
+
+
+@router.post("/verify-otp", response_model=MeProfileResponse, status_code=status.HTTP_200_OK)
+async def verify_otp(
+    payload: VerifyOtpRequest,
+    patient_id: str = Depends(get_current_patient_id),
+) -> MeProfileResponse:
+    """Confirms the emailed OTP and marks the authenticated patient record as verified."""
+    try:
+        patient = await AuthService.verify_patient_otp(
+            patient_id=patient_id,
+            otp_code=payload.otp,
+        )
+
+        logger.info(f"[Auth API] OTP verified for patient: {patient.id}")
+        return MeProfileResponse(
+            message="Email verified successfully.",
+            data=MeProfileData(
+                id=str(patient.id),
+                fullName=patient.fullName,
+                email=patient.email,
+                isVerified=patient.isVerified,
+            )
+        )
+    except ValueError as val_err:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(val_err))
+    except Exception as exc:
+        logger.error(f"[Auth API Exception] OTP verification failed: {exc}", exc_info=True)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Server OTP verification process error.")
 
 
 @router.post("/logout", status_code=status.HTTP_200_OK)
