@@ -9,10 +9,13 @@ generator client {
 }
 
 model Patient {
-  id        String   @id @default(uuid()) @db.Uuid
-  fullName  String   @db.VarChar(100)
-  email     String   @unique @db.VarChar(255)
-  password  String   @db.VarChar(255)
+  id           String    @id @default(uuid()) @db.Uuid
+  fullName     String    @db.VarChar(100)
+  email        String    @unique @db.VarChar(255)
+  password     String    @db.VarChar(255)
+  isVerified   Boolean   @default(false)
+  otpHash      String?   @db.VarChar(255)
+  otpExpiresAt DateTime? @db.Timestamptz
 
   documents Document[] // Unified relation array
 

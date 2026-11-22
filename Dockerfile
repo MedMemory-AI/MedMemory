@@ -16,9 +16,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         build-essential \
+        nodejs \
+        npm \
         gcc \
         curl \
-        libatomic1 && \
+        libatomic1 \
+        tesseract-ocr && \
     rm -rf /var/lib/apt/lists/*
 
 # Python virtual environment
@@ -76,7 +79,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         curl \
-        libatomic1 && \
+        libatomic1 \
+        tesseract-ocr && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy Python virtual environment

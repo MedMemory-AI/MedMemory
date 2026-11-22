@@ -2,6 +2,7 @@ import jwt
 from fastapi import Request, Response, status
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
+from app.core.db import db, connect_db
 from app.services.auth.jwt import decode_access_token
 
 
@@ -10,10 +11,17 @@ class AuthMiddleware(BaseHTTPMiddleware):
     Automated security middleware that intercepts requests targeting protected clinical routes
     and enforces stateless JWT authorization signatures before hitting route controllers.
     """
-    def __init__(self, app, protected_prefixes: list[str] = None):
+    def __init__(
+        self,
+        app,
+        protected_prefixes: list[str] = None,
+        verified_prefixes: list[str] = None,
+    ):
         super().__init__(app)
         # Define paths or prefixes that absolutely require valid authorization headers
         self.protected_prefixes = protected_prefixes or ["/ingestion", "/timeline"]
+        # Clinical feature routes additionally require a completed email OTP verification
+        self.verified_prefixes = verified_prefixes or ["/ingestion", "/timeline"]
 
 
     async def dispatch(self, request: Request, call_next) -> Response:
@@ -53,6 +61,26 @@ class AuthMiddleware(BaseHTTPMiddleware):
                 
                 # 4. Attach verified profile scope state onto request context safely
                 request.state.patient_id = patient_id
+
+                requires_verified = any(
+                    request.url.path.startswith(prefix) for prefix in self.verified_prefixes
+                )
+                if requires_verified:
+                    await connect_db()
+                    patient = await db.patient.find_unique(where={"id": patient_id})
+                    if not patient:
+                        return JSONResponse(
+                            status_code=status.HTTP_401_UNAUTHORIZED,
+                            content={"success": False, "detail": "Patient profile not found."}
+                        )
+                    if not patient.isVerified:
+                        return JSONResponse(
+                            status_code=status.HTTP_403_FORBIDDEN,
+                            content={
+                                "success": False,
+                                "detail": "Email OTP verification is required before using this feature.",
+                            }
+                        )
 
             except jwt.ExpiredSignatureError:
                 return JSONResponse(
