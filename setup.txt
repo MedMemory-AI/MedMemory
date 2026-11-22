@@ -17,6 +17,6 @@
 
 
 ##===>>>  For publishing Img to DockerHub:
-        1. docker build --network=host -t srinivasbatthula05/medmemory:latest .
+        1. docker build --network=host -t srinivasbatthula05/medmemory-backend:latest .
         2. ./setup.sh  OR  .\setup.ps1  OR  docker compose up
-        3. docker push srinivasbatthula05/medmemory:latest
+        3. docker push srinivasbatthula05/medmemory-backend:latest
