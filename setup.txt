@@ -11,9 +11,10 @@
 8. prisma db push --schema=app/prisma/schema.prisma
 
 9. uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+10. `ollama run qwen2.5:3b` in Shell
 
-10. Postgres Dashboard -->> npx prisma studio --url=postgresql://postgres:local_secret@localhost:5432/medmemory
-11. Qdrant Dashboard -->> http://localhost:6333/dashboard
+11. Postgres Dashboard -->> npx prisma studio --url=postgresql://postgres:local_secret@localhost:5432/medmemory
+12. Qdrant Dashboard -->> http://localhost:6333/dashboard
 
 
 ##===>>>  For publishing Img to DockerHub:
